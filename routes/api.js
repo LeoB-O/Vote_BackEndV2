@@ -21,7 +21,7 @@ router.get('/candidates', function (req, res, next) {
                 })
             }
         };
-        util.handleResponse(res, err, ret);
+        util.handleResponse(res, err, ret.data);
     });
 });
 
