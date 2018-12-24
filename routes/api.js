@@ -53,7 +53,7 @@ router.post('/candidate', function (req, res, next) {
                                     if (err) {
                                         res.send({success: false, data: {err: err}});
                                     } else {
-                                        Candidate.update({_id: candidate._id}, {$inc: {voteNum: 1}}, function (err, candidate) {
+                                        Candidate.updateOne({_id: candidate._id}, {$inc: {voteNum: 1}}, function (err, candidate) {
                                             util.handleResponse(res, err, candidate);
                                         });
                                     }
