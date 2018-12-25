@@ -17,4 +17,8 @@ router.put('/candidate', function (req, res, next) {
     });
 });
 
+router.post('/login', function (req, res, next) {
+    res.send({success: true, data: {msg: 'login success.'}});
+});
+
 module.exports = router;

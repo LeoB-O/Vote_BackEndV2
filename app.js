@@ -37,7 +37,9 @@ auth.init();
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/api', apiRouter);
-app.use('/admin', auth.authorizedOnly(), adminRouter);
+app.use('/admin', function (req, res, next) {
+    auth.authorizedOnly(req, res, next);
+}, adminRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

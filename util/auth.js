@@ -3,49 +3,59 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
 passport.serializeUser(function (user, done) {
-   done(null, user._id); 
+    done(null, user._id);
 });
 
 passport.deserializeUser(function (id, done) {
-   User.findById(id, function (err, user) {
-       if (err || !user) return done(err, null);
-       done(null, user);
-   });
+    User.findById(id, function (err, user) {
+        if (err || !user) return done(err, null);
+        done(null, user);
+    });
 });
 
 module.exports = function (app, options) {
-  if (!options.successRedirect) {
-      options.successRedirect = '/api/candidates';
-  }
-  if (!options.failureRedirect) {
-      options.failureRedirect = '/api/candidates';
-  } 
-  
-  return {
-      init: function () {
-          passport.use(new LocalStrategy(
-              function (username, password, done) {
-                  User.findOne({username: username}, function (err, user) {
-                     if (err) { return done(err) }
+    if (!options.successRedirect) {
+        options.successRedirect = '/api/candidates';
+    }
+    if (!options.failureRedirect) {
+        options.failureRedirect = '/api/candidates';
+    }
 
-                     if (!user) {
-                         return done(null, false, {message: 'Incorrect username.'});
-                     }
+    return {
+        init: function () {
+            passport.use(new LocalStrategy(
+                function (username, password, done) {
+                    User.findOne({username: username}, function (err, user) {
+                        if (err) {
+                            return done(err)
+                        }
 
-                     if (!user.validPassword(password)) {
-                         return done(null, false, {message: 'Incorrect password.'});
-                     }
+                        if (!user) {
+                            return done(null, false, {message: 'Incorrect username.'});
+                        }
 
-                     return done(null, user);
-                  });
-              }
-          ));
+                        if (!user.validPassword(password)) {
+                            return done(null, false, {message: 'Incorrect password.'});
+                        }
 
-          app.use(passport.initialize());
-          app.use(passport.session());
-      },
-      authorizedOnly: function () {
-          return passport.authenticate('local', {failureRedirect: options.failureRedirect});
-      }
-  };
+                        return done(null, user);
+                    });
+                }
+            ));
+
+            app.use(passport.initialize());
+            app.use(passport.session());
+        },
+        authorizedOnly: function (req, res, next) {
+            return passport.authenticate('local', {failureMessage: 'testerror'}, function (err, user, info, status) {
+                req.session.messages = info ? info.message : null;
+                req.session.status = status;
+                if (!req.session.messages) {
+                    next();
+                } else {
+                    res.send({success: false, data:{msg:req.session.messages}});
+                }
+            })(req, res, next);
+        }
+    };
 };
