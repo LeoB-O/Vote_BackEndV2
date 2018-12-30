@@ -10,6 +10,18 @@ module.exports = {
         }
     },
 
+    reqShouldOnlyContain: function(params) {
+        return function (req) {
+            let ret = {};
+            for (let p of params) {
+                if (req[p]) {
+                    ret[p] = req[p]
+                }
+            }
+            return ret;
+        }
+    },
+
     handleResponse: function (res, err, data) {
         if (data === null) {
             data = {}

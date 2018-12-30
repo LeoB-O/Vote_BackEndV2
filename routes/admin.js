@@ -19,6 +19,14 @@ router.put('/candidate', function (req, res, next) {
     });
 });
 
+// Modify a candidate record
+router.post('/candidate', function (req, res, next) {
+    let candidate = util.reqShouldOnlyContain(['name', 'info', 'voteNum', 'id'])(req.body);
+    Candidate.findByIdAndUpdate(candidate.id, candidate, function (err, raw) {
+        util.handleResponse(res, err, null);
+    });
+});
+
 // api for login
 // actually every api under admin could be used as login
 router.post('/login', function (req, res, next) {
@@ -48,7 +56,7 @@ router.put('/setting', function (req, res, next) {
         return;
     } else {
         for (let key in body) {
-            Setting.updateOne({key: key}, {key: key, value: body[key]}, {upsert: true}, function (err, raw) {
+            Setting.updateOne({key: key}, {key: key, value: body[key], active: true}, {upsert: true}, function (err, raw) {
                 if (!sent) {
                     util.handleResponse(res, err, null);
                     sent = true;
