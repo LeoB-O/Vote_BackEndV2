@@ -33,4 +33,16 @@ suite('Login API tests', function () {
             done();
         });
     });
+
+    test('should be able to access other admin api without credentials after login', function (done) {
+        rest.post(base+'/admin/login', {data:{username:'test', password:'test'}}).on('success', function (data) {
+
+            // TODO restler seems can not save session
+            // Have to submit username and password even after login
+            rest.get(base+'/admin/setting', {data:{username:'test', password:'test'}}).on('success', function (data) {
+                assert(data.success===true);
+                done();
+            });
+        });
+    });
 });
