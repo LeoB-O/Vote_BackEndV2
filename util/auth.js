@@ -47,10 +47,16 @@ module.exports = function (app, options) {
             app.use(passport.session());
         },
         authorizedOnly: function (req, res, next) {
+            if (req.session.success) {
+                return next();
+            }
             return passport.authenticate('local', {failureMessage: 'testerror'}, function (err, user, info, status) {
                 req.session.messages = info ? info.message : null;
                 req.session.status = status;
+                req.body.username = '';
+                req.body.password = '';
                 if (!req.session.messages) {
+                    req.session.success = true;
                     next();
                 } else {
                     res.send({success: false, data:{msg:req.session.messages}});
