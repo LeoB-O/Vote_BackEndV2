@@ -27,6 +27,17 @@ router.post('/candidate', function (req, res, next) {
     });
 });
 
+// delete a candidate
+router.delete('/candidate', function (req, res, next) {
+    let candidate = util.reqShouldOnlyContain(['id'])(req.body);
+    if (!candidate['id']) {
+        return util.handleResponse(res, 'need id.', {});
+    }
+    Candidate.findByIdAndDelete(candidate['id'], function (err, candidate) {
+        candidate?util.handleResponse(res, err, null):util.handleResponse(res, 'no such candidate.', null);
+    });
+});
+
 // api for login
 // actually every api under admin could be used as login
 router.post('/login', function (req, res, next) {
